@@ -9,6 +9,7 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 @SpringBootApplication
+
 public class BatchProccessingApplication {
 
 	public static void main(String[] args) {

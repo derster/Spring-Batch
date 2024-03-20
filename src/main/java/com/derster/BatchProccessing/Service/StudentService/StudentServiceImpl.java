@@ -8,6 +8,8 @@ import com.derster.BatchProccessing.repository.StudentRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 public class StudentServiceImpl implements StudentService{
     private final StudentRepository studentRepository;
@@ -23,5 +25,20 @@ public class StudentServiceImpl implements StudentService{
         Student student = studentMapper.toStudent(studentDto);
 
         return studentMapper.toStudentResponseDto(studentRepository.save(student));
+    }
+
+    @Override
+    public List<StudentResponseDto> findAllStudents() {
+        return studentRepository.findAll()
+                .stream()
+                .map(studentMapper::toStudentResponseDto)
+                .toList();
+    }
+
+    @Override
+    public StudentResponseDto findStudentById(Integer id) {
+        return studentRepository.findById(id)
+                .map(studentMapper::toStudentResponseDto)
+                .orElse(null);
     }
 }

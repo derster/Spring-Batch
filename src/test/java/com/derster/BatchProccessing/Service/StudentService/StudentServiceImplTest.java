@@ -13,6 +13,10 @@ import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.mockito.junit.MockitoJUnitRunner;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
@@ -69,5 +73,73 @@ class StudentServiceImplTest {
         assertEquals(dto.getAge(), responseDto.getAge());
 
         verify(studentMapper, times(1)).toStudent(dto);
+        verify(studentRepository, times(1)).save(student);
+        verify(studentMapper, times(1)).toStudentResponseDto(saveStudent);
+    }
+
+    @Test
+    public void should_successfully_find_all_student(){
+        // Given
+        List<Student> students = new ArrayList<>();
+
+        Student student = new Student(
+                1,
+                "John",
+                "Doe",
+                21
+        );
+
+        students.add(student);
+
+        // Mock the calls
+        when(studentRepository.findAll()).thenReturn(students);
+        when(studentMapper.toStudentResponseDto(any(Student.class))).thenReturn(new StudentResponseDto(
+                "John",
+                "Doe",
+                21
+        ));
+
+        // When
+        List<StudentResponseDto> result = studentService.findAllStudents();
+
+        // Then
+        assertEquals(students.size(), result.size());
+        assertEquals(students.get(0).getLastName(), result.get(0).getLastName());
+
+        verify(studentRepository, times(1)).findAll();
+        verify(studentMapper, times(1)).toStudentResponseDto(student);
+
+    }
+
+    @Test
+    public void should_successfully_find_student_by_id(){
+
+        // Given
+        Student student = new Student(
+                1,
+                "John",
+                "Doe",
+                21
+        );
+        StudentResponseDto responseDto = new StudentResponseDto(
+                "John",
+                "Doe",
+                21
+        );
+        int id = 1;
+
+        // Mock the Calls
+        when(studentRepository.findById(id)).thenReturn(Optional.of(student));
+        when(studentMapper.toStudentResponseDto(student)).thenReturn(responseDto);
+
+        // When
+        Student result = studentRepository.findById(id).orElse(null);
+
+        // Then
+        assertEquals(student.getLastName(), result.getLastName());
+        assertEquals(student.getFirstName(), result.getFirstName());
+        verify(studentRepository, times(1)).findById(id);
+        verify(studentMapper, times(1)).toStudentResponseDto(student);
+
     }
 }
